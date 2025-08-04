@@ -1,93 +1,165 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dice Game</title>
+  <meta charset="UTF-8">
+  <title>🎲 Luxury Dice Game</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e1e1e, #121212);
+      color: #f5f5f5;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      margin-top: 50px;
-      background-color: #f4f4f4;
+      padding: 50px 20px;
     }
+
+    h1 {
+      font-size: 48px;
+      color: gold;
+      margin-bottom: 20px;
+    }
+
+    .dice-container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 30px 0;
+    }
+
+    .dice {
+      width: 100px;
+      height: 100px;
+      font-size: 64px;
+      background-color: #222;
+      border: 3px solid gold;
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+      transition: transform 0.4s;
+    }
+
+    .rolling {
+      animation: spin 0.5s infinite linear;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+
     button {
-      padding: 10px 20px;
-      font-size: 18px;
-      background-color: #4CAF50;
-      color: white;
+      padding: 12px 28px;
+      font-size: 20px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      background-color: gold;
+      color: #000;
       cursor: pointer;
+      font-weight: bold;
+      margin-top: 20px;
     }
+
     button:hover {
-      background-color: #45a049;
+      background-color: #e5c100;
     }
-    .result {
-      font-size: 18px;
+
+    .log {
+      background-color: #2b2b2b;
       margin-top: 30px;
       padding: 20px;
-      background-color: #fff;
-      width: 60%;
+      border-radius: 12px;
+      width: 70%;
       margin-left: auto;
       margin-right: auto;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
     }
-    h1 {
-      font-size: 36px;
-    }
-    h3 {
+
+    .scoreboard {
       margin-top: 20px;
-      color: #333;
+      font-size: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h1>🎲 Dice Game</h1>
-  <button onclick="playGame()">Start Game</button>
+  <h1>🎲 Luxury Dice Game</h1>
 
-  <div class="result" id="log"></div>
+  <div class="dice-container">
+    <div class="dice" id="dice1">🎲</div>
+    <div class="dice" id="dice2">🎲</div>
+  </div>
+
+  <button onclick="playRound()">Roll Dice</button>
+
+  <div class="log" id="log"></div>
 
   <script>
+    let round = 1;
+    let player1Score = 0;
+    let player2Score = 0;
+    let gameEnded = false;
+
     function rollDice() {
       return Math.floor(Math.random() * 6) + 1;
     }
 
-    function playGame() {
-      let player1Score = 0;
-      let player2Score = 0;
-      let log = '';
-      let gameEnded = false;
+    function getDiceEmoji(num) {
+      const diceFaces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+      return diceFaces[num - 1];
+    }
 
-      for (let round = 1; round <= 6; round++) {
+    function playRound() {
+      if (gameEnded || round > 6) return;
+
+      const dice1 = document.getElementById('dice1');
+      const dice2 = document.getElementById('dice2');
+      const log = document.getElementById('log');
+
+      // Start roll animation
+      dice1.classList.add('rolling');
+      dice2.classList.add('rolling');
+
+      setTimeout(() => {
+        // Stop animation
+        dice1.classList.remove('rolling');
+        dice2.classList.remove('rolling');
+
+        // Roll results
         const roll1 = rollDice();
         const roll2 = rollDice();
 
-        log += `<strong>Round ${round}:</strong> Player 1 rolled ${roll1}, Player 2 rolled ${roll2}<br>`;
+        dice1.innerHTML = getDiceEmoji(roll1);
+        dice2.innerHTML = getDiceEmoji(roll2);
 
         player1Score += roll1;
         player2Score += roll2;
 
+        let message = `<strong>Round ${round}:</strong> Player 1 rolled ${roll1}, Player 2 rolled ${roll2}<br>`;
+
         if (roll1 === roll2) {
-          log += `🎯 Dice matched in Round ${round}! Game ends early.<br>`;
+          message += `🎯 Dice matched! Game ends early.<br>`;
           gameEnded = true;
-          break;
         }
-      }
 
-      log += `<br><strong>Final Scores:</strong><br>`;
-      log += `Player 1: ${player1Score}<br>`;
-      log += `Player 2: ${player2Score}<br>`;
+        round++;
 
-      if (player1Score > player2Score) {
-        log += `<h3>🏆 Player 1 Wins!</h3>`;
-      } else if (player2Score > player1Score) {
-        log += `<h3>🏆 Player 2 Wins!</h3>`;
-      } else {
-        log += `<h3>🤝 It's a Draw!</h3>`;
-      }
+        if (gameEnded || round > 6) {
+          message += `<br><strong>Final Scores:</strong><br>`;
+          message += `Player 1: ${player1Score}<br>`;
+          message += `Player 2: ${player2Score}<br>`;
 
-      document.getElementById("log").innerHTML = log;
+          if (player1Score > player2Score) {
+            message += `<h3>🏆 Player 1 Wins!</h3>`;
+          } else if (player2Score > player1Score) {
+            message += `<h3>🏆 Player 2 Wins!</h3>`;
+          } else {
+            message += `<h3>🤝 It's a Draw!</h3>`;
+          }
+        }
+
+        log.innerHTML += message + '<hr>';
+      }, 600);
     }
   </script>
 
